@@ -20,6 +20,7 @@ interface Inquiry {
   subject: string;
   message: string;
   aiSuggestion: string;
+  finalResponse?: string;
   confidence: number;
   timestamp: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -32,6 +33,8 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isNewInquiryOpen, setIsNewInquiryOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editedResponse, setEditedResponse] = useState('');
   const [newInquiry, setNewInquiry] = useState({
     customerName: '',
     email: '',
@@ -126,6 +129,34 @@ export function Dashboard() {
     } catch (error) {
       console.error('Error rejecting inquiry:', error);
       toast.error('Błąd podczas odrzucenia');
+    }
+  };
+
+  const openEditDialog = () => {
+    if (!selectedInquiry) return;
+    setEditedResponse(selectedInquiry.finalResponse || selectedInquiry.aiSuggestion || '');
+    setIsEditOpen(true);
+  };
+
+  const handleEditAndSend = async () => {
+    if (!selectedInquiry) return;
+    try {
+      const response = await apiCall(`/inquiries/${selectedInquiry.id}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: 'approved', finalResponse: editedResponse })
+      });
+
+      if (response.success) {
+        setInquiries(prev => prev.map(inquiry => 
+          inquiry.id === selectedInquiry.id ? { ...inquiry, status: 'approved', finalResponse: editedResponse } : inquiry
+        ));
+        setSelectedInquiry(prev => prev ? { ...prev, status: 'approved', finalResponse: editedResponse } as Inquiry : prev);
+        setIsEditOpen(false);
+        toast.success('Odpowiedź została wysłana');
+      }
+    } catch (error) {
+      console.error('Error sending edited response:', error);
+      toast.error('Błąd podczas wysyłania odpowiedzi');
     }
   };
 
@@ -443,6 +474,13 @@ export function Dashboard() {
                         <XCircle className="h-4 w-4 mr-1" />
                         Odrzuć
                       </Button>
+                      <Button
+                        size="sm"
+                        onClick={openEditDialog}
+                        disabled={selectedInquiry.status !== 'pending'}
+                      >
+                        Modyfikuj i wyślij
+                      </Button>
                     </div>
                   </div>
                 </CardHeader>
@@ -491,9 +529,17 @@ export function Dashboard() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="rounded-lg bg-blue-50 p-4 border border-blue-200">
-                          <p className="whitespace-pre-wrap">{selectedInquiry.aiSuggestion}</p>
-                        </div>
+                        {selectedInquiry.finalResponse ? (
+                          <div className="rounded-lg bg-green-50 p-4 border border-green-200">
+                            <p className="text-sm text-gray-600 mb-2">Ostateczna odpowiedź</p>
+                            <p className="whitespace-pre-wrap">{selectedInquiry.finalResponse}</p>
+                          </div>
+                        ) : (
+                          <div className="rounded-lg bg-blue-50 p-4 border border-blue-200">
+                            <p className="text-sm text-gray-600 mb-2">Sugestia AI</p>
+                            <p className="whitespace-pre-wrap">{selectedInquiry.aiSuggestion}</p>
+                          </div>
+                        )}
                         <div className="text-sm text-gray-500">
                           <p>Sugestia wygenerowana na podstawie:</p>
                           <ul className="ml-4 mt-1 list-disc space-y-1">
@@ -506,6 +552,28 @@ export function Dashboard() {
                       </div>
                     </TabsContent>
                   </Tabs>
+                  <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                    <DialogContent className="sm:max-w-lg">
+                      <DialogHeader>
+                        <DialogTitle>Edytuj odpowiedź przed wysłaniem</DialogTitle>
+                        <DialogDescription>
+                          Zmodyfikuj treść sugerowanej odpowiedzi przed zatwierdzeniem i wysyłką.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-2">
+                        <Label>Treść odpowiedzi</Label>
+                        <Textarea
+                          value={editedResponse}
+                          onChange={(e) => setEditedResponse(e.target.value)}
+                          rows={6}
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setIsEditOpen(false)}>Anuluj</Button>
+                        <Button onClick={handleEditAndSend}>Wyślij</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             ) : (

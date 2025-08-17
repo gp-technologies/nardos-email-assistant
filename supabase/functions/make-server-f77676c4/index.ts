@@ -97,7 +97,7 @@ app.post('/inquiries', async (c) => {
 app.put('/inquiries/:id/status', async (c) => {
   try {
     const inquiryId = c.req.param('id');
-    const { status, feedback } = await c.req.json();
+    const { status, feedback, finalResponse } = await c.req.json();
 
     const existingData = await kv.get(`inquiry:${inquiryId}`);
     if (!existingData) {
@@ -110,6 +110,9 @@ app.put('/inquiries/:id/status', async (c) => {
 
     if (feedback) {
       inquiry.feedback = feedback;
+    }
+    if (finalResponse) {
+      inquiry.finalResponse = finalResponse;
     }
 
     await kv.set(`inquiry:${inquiryId}`, inquiry);

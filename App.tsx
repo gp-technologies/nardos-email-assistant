@@ -68,8 +68,7 @@ export default function App() {
             <div>
               <p className="text-sm font-medium text-blue-900 mb-1">Demo Aplikacji</p>
               <p className="text-xs text-blue-700">
-                To jest interaktywne demo wtyczki WordPress dla firmy Nardos House. 
-                Aplikacja jest połączona z backendem Supabase i w pełni funkcjonalna.
+                To jest demonstracyjna wersja aplikacji — niefunkcjonalna i przeznaczona wyłącznie do celów prezentacyjnych.
               </p>
             </div>
           </div>
