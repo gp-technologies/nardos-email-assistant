@@ -40,6 +40,13 @@ function asObject<T = any>(value: unknown): T {
   return value as T;
 }
 
+// Support requests that include the function slug in the path by rewriting
+app.all('/make-server-f77676c4/*', (c) => {
+  const url = new URL(c.req.url);
+  url.pathname = c.req.path.replace(/^\/make-server-f77676c4/, '') || '/';
+  return app.fetch(new Request(url.toString(), c.req.raw));
+});
+
 // Get all inquiries
 app.get('/inquiries', async (c) => {
   try {
