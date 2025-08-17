@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ScrollArea } from './ui/scroll-area';
 import { CheckCircle, XCircle, MessageSquare, Clock, TrendingUp, Settings, Plus, Loader2, RefreshCw } from 'lucide-react';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { projectId, publicAnonKey, functionName } from '../utils/supabase/info';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -41,7 +41,9 @@ export function Dashboard() {
   });
 
   const apiCall = async (endpoint: string, options?: RequestInit) => {
-    const response = await fetch(`https://${projectId}.supabase.co/functions/v1${endpoint}`, {
+    const base = `https://${projectId}.supabase.co/functions/v1/${functionName}`;
+    const url = `${base}${endpoint}`;
+    const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',

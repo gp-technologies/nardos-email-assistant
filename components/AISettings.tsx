@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { Settings, Brain, Database, MessageSquare, Save, Plus, X, Loader2 } from 'lucide-react';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { projectId, publicAnonKey, functionName } from '../utils/supabase/info';
 import { toast } from 'sonner@2.0.3';
 
 interface AIConfig {
@@ -56,7 +56,9 @@ export function AISettings() {
   const [showNewItem, setShowNewItem] = useState(false);
 
   const apiCall = async (endpoint: string, options?: RequestInit) => {
-    const response = await fetch(`https://${projectId}.supabase.co/functions/v1${endpoint}`, {
+    const base = `https://${projectId}.supabase.co/functions/v1/${functionName}`;
+    const url = `${base}${endpoint}`;
+    const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',

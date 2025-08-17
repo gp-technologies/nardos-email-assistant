@@ -2,3 +2,4 @@
 
 export const projectId = "jrgnligmsdjnedotytec"
 export const publicAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpyZ25saWdtc2RqbmVkb3R5dGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NDg2MzUsImV4cCI6MjA3MTAyNDYzNX0.gN0zPKurMqzx27Sp0uWwLUSQFhheDd-jTeLPKcx0yg8"
+export const functionName = "make-server-f77676c4";
