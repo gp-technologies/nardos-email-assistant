@@ -239,14 +239,14 @@ export function Dashboard() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="mb-2">Nardos House - AI Response Assistant</h1>
+            <h1 className="mb-2">Nardos Group - Asystent odpowiedzi e‑mail</h1>
             <p className="text-gray-600">Automatyczne sugestie odpowiedzi na zapytania klientów</p>
           </div>
           
           <div className="flex gap-2">
             <Button
               variant="outline"
-              size="sm"
+              size="default"
               onClick={refreshInquiries}
               disabled={refreshing}
             >
