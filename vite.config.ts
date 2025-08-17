@@ -5,6 +5,15 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      "lucide-react@0.487.0": "lucide-react",
+      "lucide-react@0.455.0": "lucide-react",
+      "embla-carousel-react@8.6.0": "embla-carousel-react",
+      "vaul@1.1.2": "vaul",
+      "react-resizable-panels@2.1.7": "react-resizable-panels",
+      "cmdk@1.1.1": "cmdk",
+      "input-otp@1.4.2": "input-otp",
+      "react-day-picker@8.10.1": "react-day-picker",
+      "recharts@2.15.2": "recharts",
       "@radix-ui/react-popover@1.1.6": "@radix-ui/react-popover",
       "@radix-ui/react-scroll-area@1.2.3": "@radix-ui/react-scroll-area",
       "@radix-ui/react-alert-dialog@1.1.6": "@radix-ui/react-alert-dialog",
