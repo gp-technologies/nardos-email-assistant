@@ -56,7 +56,7 @@ export function AISettings() {
   const [showNewItem, setShowNewItem] = useState(false);
 
   const apiCall = async (endpoint: string, options?: RequestInit) => {
-    const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-f77676c4${endpoint}`, {
+    const response = await fetch(`https://${projectId}.supabase.co/functions/v1${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',

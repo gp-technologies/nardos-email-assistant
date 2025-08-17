@@ -22,12 +22,12 @@ const supabase = createClient(
 );
 
 // Get all inquiries
-app.get('/make-server-f77676c4/inquiries', async (c) => {
+app.get('/inquiries', async (c) => {
   try {
     const inquiries = await kv.getByPrefix('inquiry:');
-    const formattedInquiries = inquiries.map(item => ({
+    const formattedInquiries = inquiries.map((item: any) => ({
       id: item.key.replace('inquiry:', ''),
-      ...JSON.parse(item.value)
+      ...item.value
     })).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     
     return c.json({ success: true, data: formattedInquiries });
@@ -38,7 +38,7 @@ app.get('/make-server-f77676c4/inquiries', async (c) => {
 });
 
 // Create new inquiry
-app.post('/make-server-f77676c4/inquiries', async (c) => {
+app.post('/inquiries', async (c) => {
   try {
     const inquiry = await c.req.json();
     const inquiryId = `inquiry_${Date.now()}`;
@@ -55,7 +55,7 @@ app.post('/make-server-f77676c4/inquiries', async (c) => {
     inquiryData.aiSuggestion = aiSuggestion.response;
     inquiryData.confidence = aiSuggestion.confidence;
     
-    await kv.set(`inquiry:${inquiryId}`, JSON.stringify(inquiryData));
+    await kv.set(`inquiry:${inquiryId}`, inquiryData);
     
     return c.json({ success: true, data: inquiryData });
   } catch (error) {
@@ -65,7 +65,7 @@ app.post('/make-server-f77676c4/inquiries', async (c) => {
 });
 
 // Update inquiry status
-app.put('/make-server-f77676c4/inquiries/:id/status', async (c) => {
+app.put('/inquiries/:id/status', async (c) => {
   try {
     const inquiryId = c.req.param('id');
     const { status, feedback } = await c.req.json();
@@ -75,7 +75,7 @@ app.put('/make-server-f77676c4/inquiries/:id/status', async (c) => {
       return c.json({ success: false, error: 'Inquiry not found' }, 404);
     }
     
-    const inquiry = JSON.parse(existingData);
+    const inquiry = existingData;
     inquiry.status = status;
     inquiry.updatedAt = new Date().toISOString();
     
@@ -83,7 +83,7 @@ app.put('/make-server-f77676c4/inquiries/:id/status', async (c) => {
       inquiry.feedback = feedback;
     }
     
-    await kv.set(`inquiry:${inquiryId}`, JSON.stringify(inquiry));
+    await kv.set(`inquiry:${inquiryId}`, inquiry);
     
     // Update learning statistics
     await updateLearningStats(status, inquiry.confidence);
@@ -96,9 +96,9 @@ app.put('/make-server-f77676c4/inquiries/:id/status', async (c) => {
 });
 
 // Get AI configuration
-app.get('/make-server-f77676c4/config', async (c) => {
+app.get('/config', async (c) => {
   try {
-    const config = await kv.get('ai_config') || JSON.stringify({
+    const config = await kv.get('ai_config') || ({
       confidenceThreshold: 85,
       autoResponse: false,
       responseTemplate: 'Dziękuję za zapytanie! Na podstawie Państwa wymagań...',
@@ -106,7 +106,7 @@ app.get('/make-server-f77676c4/config', async (c) => {
       contactEmail: 'kontakt@nardoshouse.pl'
     });
     
-    return c.json({ success: true, data: JSON.parse(config) });
+    return c.json({ success: true, data: config });
   } catch (error) {
     console.log(`Error fetching config: ${error}`);
     return c.json({ success: false, error: error.message }, 500);
@@ -114,10 +114,10 @@ app.get('/make-server-f77676c4/config', async (c) => {
 });
 
 // Update AI configuration
-app.put('/make-server-f77676c4/config', async (c) => {
+app.put('/config', async (c) => {
   try {
     const config = await c.req.json();
-    await kv.set('ai_config', JSON.stringify(config));
+    await kv.set('ai_config', config);
     
     return c.json({ success: true, data: config });
   } catch (error) {
@@ -127,12 +127,12 @@ app.put('/make-server-f77676c4/config', async (c) => {
 });
 
 // Get knowledge base
-app.get('/make-server-f77676c4/knowledge', async (c) => {
+app.get('/knowledge', async (c) => {
   try {
     const knowledgeItems = await kv.getByPrefix('knowledge:');
-    const formattedItems = knowledgeItems.map(item => ({
+    const formattedItems = knowledgeItems.map((item: any) => ({
       id: item.key.replace('knowledge:', ''),
-      ...JSON.parse(item.value)
+      ...item.value
     }));
     
     return c.json({ success: true, data: formattedItems });
@@ -143,7 +143,7 @@ app.get('/make-server-f77676c4/knowledge', async (c) => {
 });
 
 // Add knowledge item
-app.post('/make-server-f77676c4/knowledge', async (c) => {
+app.post('/knowledge', async (c) => {
   try {
     const item = await c.req.json();
     const itemId = `knowledge_${Date.now()}`;
@@ -154,7 +154,7 @@ app.post('/make-server-f77676c4/knowledge', async (c) => {
       createdAt: new Date().toISOString()
     };
     
-    await kv.set(`knowledge:${itemId}`, JSON.stringify(knowledgeItem));
+    await kv.set(`knowledge:${itemId}`, knowledgeItem);
     
     return c.json({ success: true, data: knowledgeItem });
   } catch (error) {
@@ -164,7 +164,7 @@ app.post('/make-server-f77676c4/knowledge', async (c) => {
 });
 
 // Delete knowledge item
-app.delete('/make-server-f77676c4/knowledge/:id', async (c) => {
+app.delete('/knowledge/:id', async (c) => {
   try {
     const itemId = c.req.param('id');
     await kv.del(`knowledge:${itemId}`);
@@ -177,16 +177,16 @@ app.delete('/make-server-f77676c4/knowledge/:id', async (c) => {
 });
 
 // Get learning statistics
-app.get('/make-server-f77676c4/stats', async (c) => {
+app.get('/stats', async (c) => {
   try {
-    const stats = await kv.get('learning_stats') || JSON.stringify({
+    const stats = await kv.get('learning_stats') || ({
       approved: 0,
       rejected: 0,
       avgAccuracy: 87,
       totalProcessed: 0
     });
     
-    return c.json({ success: true, data: JSON.parse(stats) });
+    return c.json({ success: true, data: stats });
   } catch (error) {
     console.log(`Error fetching stats: ${error}`);
     return c.json({ success: false, error: error.message }, 500);
@@ -196,7 +196,7 @@ app.get('/make-server-f77676c4/stats', async (c) => {
 // Mock AI suggestion generator
 async function generateAISuggestion(inquiry: any) {
   const knowledgeItems = await kv.getByPrefix('knowledge:');
-  const knowledge = knowledgeItems.map(item => JSON.parse(item.value));
+  const knowledge = knowledgeItems.map((item: any) => item.value);
   
   // Mock AI logic - in reality, this would call an AI service
   let response = '';
@@ -244,7 +244,7 @@ async function updateLearningStats(status: string, confidence: number) {
 }
 
 // Initialize default data
-app.get('/make-server-f77676c4/init', async (c) => {
+app.get('/init', async (c) => {
   try {
     // Initialize default configuration
     const defaultConfig = {
@@ -257,7 +257,7 @@ app.get('/make-server-f77676c4/init', async (c) => {
     
     const existingConfig = await kv.get('ai_config');
     if (!existingConfig) {
-      await kv.set('ai_config', JSON.stringify(defaultConfig));
+      await kv.set('ai_config', defaultConfig);
     }
     
     // Initialize default knowledge base
@@ -285,7 +285,7 @@ app.get('/make-server-f77676c4/init', async (c) => {
     for (const item of defaultKnowledge) {
       const existing = await kv.get(`knowledge:${item.id}`);
       if (!existing) {
-        await kv.set(`knowledge:${item.id}`, JSON.stringify(item));
+        await kv.set(`knowledge:${item.id}`, item);
       }
     }
 
@@ -393,19 +393,19 @@ app.get('/make-server-f77676c4/init', async (c) => {
     for (const inquiry of sampleInquiries) {
       const existing = await kv.get(`inquiry:${inquiry.id}`);
       if (!existing) {
-        await kv.set(`inquiry:${inquiry.id}`, JSON.stringify(inquiry));
+        await kv.set(`inquiry:${inquiry.id}`, inquiry);
       }
     }
     
     // Initialize stats
     const existingStats = await kv.get('learning_stats');
     if (!existingStats) {
-      await kv.set('learning_stats', JSON.stringify({
+      await kv.set('learning_stats', {
         approved: 4,
         rejected: 1,
         avgAccuracy: 91,
         totalProcessed: 8
-      }));
+      });
     }
     
     return c.json({ success: true, message: 'Initialized successfully with sample data' });
