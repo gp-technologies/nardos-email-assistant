@@ -1,0 +1,83 @@
+import { useState } from 'react';
+import { Dashboard } from './components/Dashboard';
+import { AISettings } from './components/AISettings';
+import { Button } from './components/ui/button';
+import { Card } from './components/ui/card';
+import { Badge } from './components/ui/badge';
+import { Toaster } from './components/ui/sonner';
+import { Settings, MessageSquare, Zap, Shield } from 'lucide-react';
+
+export default function App() {
+  const [activeView, setActiveView] = useState<'dashboard' | 'settings'>('dashboard');
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="border-b bg-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                  <Zap className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-semibold">AI Response Assistant</h1>
+                  <p className="text-xs text-gray-500">WordPress Plugin Demo</p>
+                </div>
+              </div>
+              <Badge className="bg-green-100 text-green-800">DEMO</Badge>
+            </div>
+            
+            <nav className="flex gap-2">
+              <Button
+                variant={activeView === 'dashboard' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveView('dashboard')}
+                className="flex items-center gap-2"
+              >
+                <MessageSquare className="h-4 w-4" />
+                Dashboard
+              </Button>
+              <Button
+                variant={activeView === 'settings' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveView('settings')}
+                className="flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                Ustawienia
+              </Button>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main>
+        {activeView === 'dashboard' ? <Dashboard /> : <AISettings />}
+      </main>
+
+      {/* Demo Info Banner */}
+      <div className="fixed bottom-4 right-4 max-w-sm">
+        <Card className="bg-blue-50 border-blue-200 p-4">
+          <div className="flex items-start gap-3">
+            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <Shield className="h-4 w-4 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-blue-900 mb-1">Demo Aplikacji</p>
+              <p className="text-xs text-blue-700">
+                To jest interaktywne demo wtyczki WordPress dla firmy Nardos House. 
+                Aplikacja jest połączona z backendem Supabase i w pełni funkcjonalna.
+              </p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Toast notifications */}
+      <Toaster />
+    </div>
+  );
+}
